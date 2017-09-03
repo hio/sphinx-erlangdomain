@@ -124,7 +124,7 @@ html_theme = 'sphinxdoc'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -182,7 +182,7 @@ htmlhelp_basename = 'sphinxcontrib-erlangdomaindoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'sphinxcontrib-erlangdomain.tex', 
+  ('index', 'sphinxcontrib-erlangdomain.tex',
    u'sphinxcontrib-erlangdomain Documentation',
    u'SHIBUKAWA Yoshiki', 'manual'),
 ]
@@ -210,13 +210,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'sphinxcontrib-erlangdomain', 
+    ('index', 'sphinxcontrib-erlangdomain',
      u'sphinxcontrib-erlangdomain Documentation',
      [u'SHIBUKAWA Yoshiki'], 1)
 ]
-
-def setup(app):
-    app.add_description_unit('confval', 'confval',
-                             objname='configuration value',
-                             indextemplate='pair: %s; configuration value')
-

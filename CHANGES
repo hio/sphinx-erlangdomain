@@ -2,8 +2,16 @@
 
 This file describes user-visible changes between the extension versions.
 
+
+Version 0.2 (In Development)
+----------------------------
+
+* Rewrite handlings of objects.
+* Types and callbacks.
+* Add an intersphinx resolution of Sphinx 1.6.
+
+
 Version 0.1 (2010-08-27)
 ------------------------
 
 * Initial version.
-
