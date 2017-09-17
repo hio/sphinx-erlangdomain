@@ -819,23 +819,32 @@ class ErlangMarker(Directive):
         self.env = self.state.document.settings.env
         marker_name = self.arguments[0].strip()
 
-        modname  = _ref_context(self.env).get('erl:module', 'erlang')
+        k_entry = self.register(self.env, marker_name)
+
+        targetnode = nodes.target('', '', ids=[k_entry.refname])
+        self.state.document.note_explicit_target(targetnode)
+
+        return [targetnode]
+
+    @staticmethod
+    def register(env, marker_name):
+        modname  = _ref_context(env).get('erl:module', 'erlang')
         fullname = '%s:%s' % (modname, marker_name)
         refname  = 'erl.mk.%s' % (fullname,)
 
-        targetnode = nodes.target('', '', ids=[refname])
-        self.state.document.note_explicit_target(targetnode)
+        k_entry = MarkerEntry(
+            fullname,
+            marker_name,
+            env.docname,
+            refname,
+        )
 
-        k_inv = self.env.domaindata['erl']['markers']
+        k_inv = env.domaindata['erl']['markers']
         if marker_name not in k_inv:
             # seealso: ErlangDomain.get_objects
-            k_inv[marker_name] = MarkerEntry(
-                fullname,
-                marker_name,
-                self.env.docname,
-                refname,
-            )
-        return [targetnode]
+            k_inv[marker_name] = k_entry
+
+        return k_entry
 
 
 class MarkerEntry:
@@ -871,6 +880,13 @@ class ErlangXRefRole(XRefRole):
                     title = title[colon+1:]
         title = RE_DROP_IMPLICIT_FLAVOR.sub('', title)
         return title, target
+
+
+class ErlangMarkerRole(XRefRole):
+    def process_link(self, env, refnode, has_explicit_title, title, target):
+        k_entry = ErlangMarker.register(env, target)
+        refnode['ids'].append(k_entry.refname)
+        return '', target
 
 
 class ErlangModuleIndex(Index):
@@ -1054,7 +1070,7 @@ class ErlangDomain(Domain):
         'record'  : ErlangXRefRole(),
         'type'    : ErlangXRefRole(),
         'mod'     : ErlangXRefRole(),
-        #'marker'  : ErlangMarkerRole(),
+        'marker'  : ErlangMarkerRole(),
         'seealso' : ErlangXRefRole(),
     }
     initial_data = {
@@ -1179,6 +1195,8 @@ class ErlangDomain(Domain):
             refname = k_entry.refname
             return make_refnode(builder, fromdocname, docname, refname,
                                 contnode, title)
+        elif typ == 'marker':
+            return None
         else:
             env_modname = node.get('erl:module')
             searchorder = node.hasattr('refspecific') and 1 or 0
