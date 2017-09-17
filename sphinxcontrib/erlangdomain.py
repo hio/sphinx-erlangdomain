@@ -1124,6 +1124,13 @@ class ErlangDomain(Domain):
                 return make_refnode(builder, fromdocname, docname, refname,
                                     contnode, title)
 
+    # get_objects returns a tuple with 6 elements.
+    # [0]: fullname to identify the object in a domain implementation.
+    # [1]: dispname.
+    # [2]: object_type.
+    # [3]: document name.
+    # [4]: anchor name in output.
+    # [5]: serach priority.
     def get_objects(self):
         for modname, info in _iteritems(self.data['modules']):
             yield (modname, modname, 'module', info[0], 'module-' + modname, 0)
