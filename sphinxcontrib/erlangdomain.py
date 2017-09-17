@@ -804,6 +804,58 @@ class ErlangCurrentModule(Directive):
         return []
 
 
+class ErlangMarker(Directive):
+    """
+    Directive for <marker> of edoc.
+    """
+
+    has_content = False
+    required_arguments = 1
+    optional_arguments = 0
+    final_argument_whitespace = False
+    option_spec = {}
+
+    def run(self):
+        self.env = self.state.document.settings.env
+        marker_name = self.arguments[0].strip()
+
+        modname  = _ref_context(self.env).get('erl:module', 'erlang')
+        fullname = '%s:%s' % (modname, marker_name)
+        refname  = 'erl.mk.%s' % (fullname,)
+
+        targetnode = nodes.target('', '', ids=[refname])
+        self.state.document.note_explicit_target(targetnode)
+
+        k_inv = self.env.domaindata['erl']['markers']
+        if marker_name not in k_inv:
+            # seealso: ErlangDomain.get_objects
+            k_inv[marker_name] = MarkerEntry(
+                fullname,
+                marker_name,
+                self.env.docname,
+                refname,
+            )
+        return [targetnode]
+
+
+class MarkerEntry:
+    def __init__(self, fullname, dispname, docname, refname):
+        self.fullname = fullname
+        self.dispname = dispname
+        self.docname  = docname
+        self.refname  = refname
+
+    def to_intersphinx_target(self):
+        return (
+                self.fullname,
+                self.dispname,
+                'marker',
+                self.docname,
+                self.refname,
+                1, # '1' means default search priority.
+            )
+
+
 class ErlangXRefRole(XRefRole):
     def process_link(self, env, refnode, has_explicit_title, title, target):
         refnode['erl:module'] = _ref_context(env).get('erl:module')
@@ -978,6 +1030,7 @@ class ErlangDomain(Domain):
         'record'  : ObjType(l_('record'),            'record'  ),
         'type'    : ObjType(l_('type'),              'type'    ),
         'module'  : ObjType(l_('module'),            'mod'     ),
+        'marker'  : ObjType(l_('marker'),            'seealso' ),
     }
 
     # directive name is used for directive#objtype.
@@ -991,6 +1044,7 @@ class ErlangDomain(Domain):
         'type'         : ErlangObject,
         'module'       : ErlangModule,
         'currentmodule': ErlangCurrentModule,
+        'marker'       : ErlangMarker,
     }
 
     roles = {
@@ -1000,6 +1054,8 @@ class ErlangDomain(Domain):
         'record'  : ErlangXRefRole(),
         'type'    : ErlangXRefRole(),
         'mod'     : ErlangXRefRole(),
+        #'marker'  : ErlangMarkerRole(),
+        'seealso' : ErlangXRefRole(),
     }
     initial_data = {
         'objects'   : {
@@ -1012,8 +1068,9 @@ class ErlangDomain(Domain):
             'ty'    : {},
         },
         'modules'   : {}, # modname -> docname, synopsis, platform, deprecated
+        'markers'   : {}, # marker_name  -> Marker
     }
-    data_version = 2
+    data_version = 3
     indices = [
         ErlangModuleIndex,
     ]
@@ -1113,6 +1170,15 @@ class ErlangDomain(Domain):
             refname = 'module-' + target
             return make_refnode(builder, fromdocname, docname, refname,
                                 contnode, title)
+        elif typ == 'seealso':
+            if target not in self.data['markers']:
+                return None
+            k_entry = self.data['markers'][target]
+            title   = target
+            docname = k_entry.docname
+            refname = k_entry.refname
+            return make_refnode(builder, fromdocname, docname, refname,
+                                contnode, title)
         else:
             env_modname = node.get('erl:module')
             searchorder = node.hasattr('refspecific') and 1 or 0
@@ -1134,6 +1200,9 @@ class ErlangDomain(Domain):
     def get_objects(self):
         for modname, info in _iteritems(self.data['modules']):
             yield (modname, modname, 'module', info[0], 'module-' + modname, 0)
+
+        for _k_name, k_entry in _iteritems(self.data['markers']):
+            yield k_entry.to_intersphinx_target()
 
         for nsname, oinv in _iteritems(self.data['objects']):
             for objname, arities in _iteritems(oinv):
