@@ -1280,7 +1280,9 @@ class ErlangDomain(Domain):
         'modules'   : {}, # modname -> docname, synopsis, platform, deprecated
         'markers'   : {}, # marker_name  -> Marker
     }
+
     data_version = 3
+
     indices = [
         ErlangModuleIndex,
     ]
