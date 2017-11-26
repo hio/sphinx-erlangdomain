@@ -430,6 +430,7 @@ class ErlangBaseObject(ObjectDescription):
         'deprecated': directives.flag,
         'module'    : directives.unchanged,
         'flavor'    : directives.unchanged,
+        'auto_importable': directives.flag,
     }
 
     doc_field_types = [
@@ -550,8 +551,11 @@ class ErlangBaseObject(ObjectDescription):
             signode += addnodes.desc_annotation(objtype_part, objtype_part)
             signode += nodes.inline(' ', ' ')
 
-        modname_part = '%s:' % (sigdata.modname,)
-        signode += addnodes.desc_addname(modname_part, modname_part)
+        if 'auto_importable' not in self.options:
+            # hide module name if the function can be auto-imported.
+            # e.g. `is_integer/1`.
+            modname_part = '%s:' % (sigdata.modname,)
+            signode += addnodes.desc_addname(modname_part, modname_part)
 
         name_part = sigdata.to_desc_name()
         signode += addnodes.desc_name(name_part, name_part)
