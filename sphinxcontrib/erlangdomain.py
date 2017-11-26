@@ -60,6 +60,7 @@ RE_ATOM = re.compile( r'''
     ''', re.VERBOSE)
 
 
+# any identifier (atom or variable).
 RE_NAME = re.compile( r'''
     ^
     (?: ([A-Za-z_]\w*) | '([-\w.]+)' )
@@ -197,21 +198,22 @@ class ErlangSignature:
         # valid long form.
         return name
 
-    def __init__(self, nsname, d):
+    # private constructor.
+    def __init__(self, nsname, d, decltype=None):
         self.nsname    = nsname
-        self.decltype  = None
+        self.decltype  = decltype        # Optional[decltype]
         self.modname   = d['modname'  ]  # Optional[str]
         self.sigil     = d['sigil'    ]  # Optional[str]
         self.name      = d['name'     ]  # str
         self.flavor    = d['flavor'   ]  # Optional[str]
+        self.explicit_flavor = d['explicit_flavor'] # Optional[bool]
         self.when_text = d['when_text']  # Optional[str]
         self.arity     = d['arity'    ]  # Optional[int]
         self.arity_max = d['arity_max']  # Optional[int]
         self.arg_text  = d['arg_text' ]  # Optional[str]
+        self.arg_list  = d['arg_list' ]  # Optional[List[Tuple[str,str]]]
         self.ret_ann   = d['ret_ann'  ]  # Optional[str]
         self.rec_decl  = d['rec_decl' ]  # Optional[str]
-        self.arg_list  = None
-        self.explicit_flavor = None
 
         if self.modname is not None:
             self.modname = self.canon_atom(self.modname)
@@ -220,9 +222,6 @@ class ErlangSignature:
         else:
             self.name = self.canon_atom(self.name)
 
-        self.explicit_flavor = self.flavor is not None
-        if self.flavor is None and d['implicit_flavor'] is not None:
-            self.flavor = d['implicit_flavor']
         if self.flavor is not None:
             self.flavor = self.canon_atom(self.flavor)
 
@@ -231,10 +230,20 @@ class ErlangSignature:
             if (nsname, self.sigil) not in (('macro', '?'), ('rec', '#')):
                 raise ValueError
 
-        # check constraint on arity.
+        # check constraint on arity/arity_max.
         if self.arity_max is not None:
-            if self.arity is not None and self.arity >= self.arity_max:
+            if self.arity is None:
                 raise ValueError
+            if self.arity >= self.arity_max:
+                raise ValueError
+
+        # compute arity.
+        if self.arg_list is not None:
+            self.arity = len(list(filter(lambda arg: arg[0] == 'mandatory', self.arg_list)))
+            if self.arity == len(self.arg_list):
+                self.arity_max = None
+            else:
+                self.arity_max = len(self.arg_list)
 
         # check constraint on the body part by nsname.
         if self.arity is not None:
@@ -257,15 +266,6 @@ class ErlangSignature:
             if arg_type != 'none':
                 raise ValueError
 
-        # compute arity.
-        if self.arg_text is not None:
-            self.arg_list  = list(self._split_arglist(self.arg_text))
-            self.arity     = len(list(filter(lambda arg: arg[0] == 'mandatory', self.arg_list)))
-            if self.arity == len(self.arg_list):
-                self.arity_max = None
-            else:
-                self.arity_max = len(self.arg_list)
-
         if self.when_text is not None:
             if self.nsname not in ('cb', 'fn', 'macro', 'ty'):
                 raise ValueError
@@ -274,61 +274,12 @@ class ErlangSignature:
             if self.nsname not in ('cb', 'fn', 'macro'):
                 raise ValueError
 
-    @staticmethod
-    def _split_arglist(arglist_str):
-        tmp   = ''
-        stack = []
-        opt   = False
-        for token in RE_PUNCS.split(arglist_str):
-            if not token or token.isspace():
-                pass
-            elif token in ('[', '{', '('):
-                tmp += token
-                stack.append(token)
-            elif token in (']', '}', ')'):
-                if not stack:
-                    raise ValueError
-                if stack.pop() == '[,':
-                    if tmp:
-                        yield ('optional', tmp.strip())
-                        tmp = ''
-                else:
-                    tmp += token
-            elif token == ',' and not stack:
-                yield ('mandatory', tmp.strip())
-                tmp = ''
-            elif token == '[,':
-                if opt:
-                    yield ('optional', tmp.strip())
-                else:
-                    yield ('mandatory', tmp.strip())
-                tmp = ''
-                opt = True
-                stack.append(token)
-            else:
-                tmp += token
-
-        if stack:
-            raise ValueError
-
-        tmp = tmp.strip()
-        if tmp:
-            yield ('mandatory', tmp)
-
 
     @classmethod
-    def from_text(cls, sig_text, nsname): # (str, nsname) -> ErlangSignature
-        m = RE_SIGNATURE.match(sig_text)
-        if not m:
-            raise ValueError
-
-        d = m.groupdict()
-        if d['arity'] is not None:
-            d['arity'] = int(d['arity'])
-        if d['arity_max'] is not None:
-            d['arity_max'] = int(d['arity_max'])
-
-        return cls(nsname, d)
+    def from_text(cls, sig_text, nsname, decltype=None):
+        # (str, nsname, Optional[decltype]) -> ErlangSignature
+        res = ErlangSignatureParser.run(sig_text)
+        return cls(nsname, res.to_dict(), decltype)
 
 
     def to_disp_name(self):
@@ -419,6 +370,245 @@ class ErlangSignature:
     @staticmethod
     def drop_flavor_from_full_name(fullname):
         return re.compile(r'@.*\Z').sub('', fullname, 1)
+
+class ErlangSignatureParser:
+    RE_ATOM = re.compile(r"[a-z]\w*|'[-\w.]+'")
+    RE_NAME = re.compile(r"[A-Za-z_]\w*|'[-\w.]+'")
+    RE_WS   = re.compile(r'\s*')
+
+    # private constructor.
+    def __init__(self, text):
+        self.text  = text
+        self.pos   = 0
+        self.stack = []
+
+        self.modname   = None
+        self.sigil     = None
+        self.name      = None
+        self.flavor    = None
+        self.explicit_flavor = None
+        self.when_text = None
+        self.arity     = None
+        self.arity_max = None
+        self.arg_list  = None
+        self.arg_text  = None
+        self.ret_ann   = None
+        self.rec_decl  = None
+
+
+    def to_dict(self):
+        return {
+                'modname'   : self.modname,
+                'sigil'     : self.sigil,
+                'name'      : self.name,
+                'flavor'    : self.flavor,
+                'explicit_flavor': self.explicit_flavor,
+                'when_text' : self.when_text,
+                'arity'     : self.arity,
+                'arity_max' : self.arity_max,
+                'arg_list'  : self.arg_list,
+                'arg_text'  : self.arg_text,
+                'ret_ann'   : self.ret_ann,
+                'rec_decl'  : self.rec_decl,
+            }
+
+
+    def skip_ws(self):
+        m = self.RE_WS.match(self.text, self.pos)
+        if m is not None:
+            self.pos = m.end(0)
+
+    def consume(self, regexp, required=False):
+        m = re.compile(regexp).match(self.text, self.pos)
+        if m is not None:
+            self.pos = m.end(0)
+            self.skip_ws()
+            return m.group(0)
+        else:
+            if required:
+                raise ValueError
+            return None
+
+    def consume_all(self, list):
+        ret = []
+        for r in list:
+            m = self.consume(r)
+            if m is None:
+                return None
+            ret.append(m)
+        return ret
+
+    def consume_token(self):
+        m = self.consume('\[,')
+        if m is None:
+            m = self.consume('[(){}\[\]]')
+        if m is None:
+            m = self.consume(self.RE_NAME)
+        if m is None:
+            m = self.consume(r'\d+')
+        if m is None:
+            m = self.consume(r'->|::|[.]{2,}|[-+*/#?$<>=,.:|]')
+        if m is None:
+            if self.pos != len(self.text):
+                raise ValueError
+        return m
+
+    def consume_arg_list(self):
+        if self.consume('[)]') is not None:
+            self.arg_list = []
+            self.arg_text = ''
+            return
+
+        self.arg_list = []
+        argm     = 'mandatory'
+        argstack = []
+        pos0   = self.pos
+        pos    = self.pos
+        endpos = self.pos
+        num_opts = 0
+        while True:
+            lastpos = self.pos
+            m = self.consume_token()
+            if m is None:
+                raise ValueError
+            if len(argstack) == 0:
+                if m == ')':
+                    arg = self.text[pos:endpos].strip()
+                    self.arg_list.append((argm, arg))
+                    break
+                if m == ',':
+                    arg = self.text[pos:endpos].strip()
+                    self.arg_list.append((argm, arg))
+                    pos    = self.pos
+                    endpos = self.pos
+                    continue
+
+            if m == '[,':
+                if endpos != pos0:
+                    arg = self.text[pos:endpos].strip()
+                    self.arg_list.append((argm, arg))
+                argm = 'optional'
+                pos    = self.pos
+                endpos = self.pos
+                argstack.append('[')
+                num_opts += 1
+                continue
+
+            if len(argstack) - num_opts == 0:
+                if m == ']':
+                    argstack.pop()
+                    num_opts -= 1
+                    continue
+                if m == '=':
+                    endpos = self.pos
+                    argm = 'optional'
+                    continue
+
+            if m in ('(', '{', '['):
+                endpos = self.pos
+                argstack.append(m)
+                continue
+            if m in (')', '}', ']'):
+                endpos = self.pos
+                argstack.pop()
+                continue
+            endpos = self.pos
+        self.arg_text = self.text[pos0:lastpos]
+
+    def consume_until(self, str):
+        pos0 = self.pos
+        while True:
+            lastpos = self.pos
+            m = self.consume_token()
+            if m is None:
+                return self.text[pos0:].strip()
+            if m == str:
+                self.pos = lastpos
+                return self.text[pos0:lastpos].strip()
+
+    def push_state(self):
+        self.stack.append(self.pos)
+
+    def accept(self):
+        self.stack.pop()
+
+    def rollback(self):
+        self.pos = self.stack.pop()
+
+    @classmethod
+    def run(cls, text):
+        self = cls(text)
+        self.skip_ws()
+
+        # "{modname}:"
+        self.push_state()
+        tmp_modname = self.consume(self.RE_ATOM)
+        if tmp_modname is None:
+            self.rollback()
+        else:
+            if self.consume(':') is None:
+                self.rollback()
+            else:
+                self.modname = tmp_modname
+                self.accept()
+        del tmp_modname
+
+        # sigil and thing name.
+        self.sigil = self.consume('[#?]')
+        self.name = self.consume(self.RE_NAME)
+        if self.name is None:
+            raise ValueError
+
+        # special case for record.
+        if self.consume('[{]') is not None:
+            m = re.compile(r'(.*?)\s*[}]\s*[.]?\Z').match(self.text, self.pos)
+            if m is None:
+                raise ValueError
+            self.rec_decl = m.groups(1)
+            return self
+
+        # fun/callback/type/macro.
+        if self.consume('/') is not None:
+            self.arity = int(self.consume(r'\d+', required=True))
+            if self.consume('[.][.]') is not None:
+                self.arity_max = int(self.consume(r'\d+', required=True))
+        elif self.consume('[(]') is not None:
+            self.consume_arg_list()
+        else:
+            pass
+
+        # flavor.
+        self.push_state()
+        if self.consume('@') is not None:
+            self.flavor = self.consume(self.RE_ATOM)
+            self.explicit_flavor = True
+            self.accept()
+        else:
+            m = self.consume_all([r'\[', '@', self.RE_ATOM, r'\]'])
+            if m is not None:
+                self.flavor = m[2]
+                self.explicit_flavor = False
+                self.accept()
+            else:
+                self.rollback()
+
+        if self.consume(r'when\b') is not None:
+            self.when_text = self.consume_until('->')
+            if self.when_text == '':
+                raise ValueError
+
+        if self.consume(r'->') is not None:
+            self.ret_ann = self.consume_until('.')
+            if self.ret_ann == '':
+                raise ValueError
+
+        # drop a terminal period if any.
+        self.consume('[.]')
+
+        if self.pos != len(self.text):
+            raise ValueError
+
+        return self
 
 class ErlangBaseObject(ObjectDescription):
     """
