@@ -680,7 +680,7 @@ class ErlangBaseObject(ObjectDescription):
 
         nsname = self.namespace_of(decltype)
         try:
-            sigdata = ErlangSignature.from_text(sig_text, nsname)
+            sigdata = ErlangSignature.from_text(sig_text, nsname, decltype)
         except ValueError:
             _warn(self.env,
                 'invalid signature for Erlang %s description: %s',
@@ -688,8 +688,6 @@ class ErlangBaseObject(ObjectDescription):
                 sig_text,
                 location=(self.env.docname, self.lineno))
             raise
-
-        sigdata.decltype = decltype
 
         if sigdata.modname is None:
             sigdata.modname = self.options.get(
@@ -1322,7 +1320,7 @@ class ErlangDomain(Domain):
 
         nsname  = ErlangObject.namespace_of_role(typ)
         try:
-            sigdata = ErlangSignature.from_text(name, nsname)
+            sigdata = ErlangSignature.from_text(name, nsname, None)
         except ValueError:
             return None
 
