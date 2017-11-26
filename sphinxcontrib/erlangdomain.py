@@ -21,7 +21,7 @@ from docutils.parsers.rst import directives
 
 from sphinx import addnodes
 from sphinx.roles import XRefRole
-from sphinx.locale import l_, _
+from sphinx.locale import _
 from sphinx.directives import ObjectDescription
 from sphinx.domains import Domain, ObjType, Index
 #from sphinx.util.compat import Directive
@@ -624,14 +624,14 @@ class ErlangBaseObject(ObjectDescription):
     }
 
     doc_field_types = [
-        TypedField('parameter', label=l_('Parameters'),
+        TypedField('parameter', label=_('Parameters'),
                    names=('param', 'parameter'),
                    typerolename='type', typenames=('type',)),
-        Field('returnvalue', label=l_('Returns'), has_arg=False,
+        Field('returnvalue', label=_('Returns'), has_arg=False,
               names=('returns', 'return')),
-        Field('returntype', label=l_('Return type'), has_arg=False,
+        Field('returntype', label=_('Return type'), has_arg=False,
               names=('rtype',)),
-        GroupedField('exceptions', label=l_('Raises'), rolename='type',
+        GroupedField('exceptions', label=_('Raises'), rolename='type',
                      names=('raises', 'raise'),
                      can_collapse=True),
     ]
@@ -1088,8 +1088,8 @@ class ErlangModuleIndex(Index):
     """
 
     name = 'modindex'
-    localname = l_('Erlang Module Index')
-    shortname = l_('modules')
+    localname = _('Erlang Module Index')
+    shortname = _('modules')
 
     def generate(self, docnames=None):
         content = {}
@@ -1232,14 +1232,14 @@ class ErlangDomain(Domain):
 
     # object_type is used for objtype of result from get_objects.
     object_types = {
-        'callback': ObjType(l_('callback function'), 'callback'),
-        'function': ObjType(l_('function'),          'func'    ),
-        'macro'   : ObjType(l_('macro'),             'macro'   ),
-        'opaque'  : ObjType(l_('opaque type'),       'type'    ),
-        'record'  : ObjType(l_('record'),            'record'  ),
-        'type'    : ObjType(l_('type'),              'type'    ),
-        'module'  : ObjType(l_('module'),            'mod'     ),
-        'marker'  : ObjType(l_('marker'),            'seealso' ),
+        'callback': ObjType(_('callback function'), 'callback'),
+        'function': ObjType(_('function'),          'func'    ),
+        'macro'   : ObjType(_('macro'),             'macro'   ),
+        'opaque'  : ObjType(_('opaque type'),       'type'    ),
+        'record'  : ObjType(_('record'),            'record'  ),
+        'type'    : ObjType(_('type'),              'type'    ),
+        'module'  : ObjType(_('module'),            'mod'     ),
+        'marker'  : ObjType(_('marker'),            'seealso' ),
     }
 
     # directive name is used for directive#objtype.
@@ -1350,7 +1350,7 @@ class ErlangDomain(Domain):
             entry = flavors[sigdata.flavor]
 
         if entry.objtype == 'callback':
-            title = '%s (%s)' % (entry.dispname, l_('callback function'))
+            title = '%s (%s)' % (entry.dispname, _('callback function'))
         elif entry.objtype == 'function':
             title = entry.dispname
         elif entry.objtype == 'macro':
@@ -1358,9 +1358,9 @@ class ErlangDomain(Domain):
         elif entry.objtype == 'record':
             title = entry.dispname
         elif entry.objtype == 'opaque':
-            title = '%s %s' % (entry.dispname, l_('opaque type'))
+            title = '%s %s' % (entry.dispname, _('opaque type'))
         elif entry.objtype == 'type':
-            title = '%s %s' % (entry.dispname, l_('type'))
+            title = '%s %s' % (entry.dispname, _('type'))
         else:
             raise ValueError
 
