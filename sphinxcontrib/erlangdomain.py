@@ -392,28 +392,22 @@ class ErlangSignature:
         return self.nsname in ['cb', 'fn', 'ty']
 
     def to_full_name(self):
-        return self.to_full_name_('', True)
+        return self.to_full_name_(True)
 
     def to_full_qualified_name(self):
-        if self.nsname == 'macro':
-            sigil = '?'
-        elif self.nsname == 'rec':
-            sigil = '#'
-        else:
-            # 'cb', 'fn', 'ty'
-            sigil = ''
-        return self.to_full_name_('', False)
+        return self.to_full_name_(False)
 
-    def to_full_name_(self, sigil, creation):
+    def to_full_name_(self, creation):
+        # sigil is not used for anchor names.
         if self.arity_max is not None and creation:
-            fullname = '%s:%s%s/%d..%d' % (self.modname, sigil, self.name, self.arity, self.arity_max)
+            fullname = '%s:%s/%d..%d' % (self.modname, self.name, self.arity, self.arity_max)
         elif self.arity is not None:
-            fullname = '%s:%s%s/%d'     % (self.modname, sigil, self.name, self.arity)
+            fullname = '%s:%s/%d'     % (self.modname, self.name, self.arity)
         elif self.is_arglist_mandatory() and creation:
             # arglist is mandatory. treat as no arguments.
-            fullname = '%s:%s%s/0' % (self.modname, sigil, self.name)
+            fullname = '%s:%s/0' % (self.modname, self.name)
         else:
-            fullname = '%s:%s%s'   % (self.modname, sigil, self.name)
+            fullname = '%s:%s'   % (self.modname, self.name)
 
         if self.flavor is not None:
             fullname += '@%s' % (self.flavor)
