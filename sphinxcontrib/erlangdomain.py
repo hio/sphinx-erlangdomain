@@ -1066,6 +1066,13 @@ class ErlangXRefRole(XRefRole):
                 colon = title.rfind(':')
                 if colon != -1:
                     title = title[colon+1:]
+
+        # if the first character is a colon, search more specific namespaces first
+        # else search builtins first
+        if target[0:1] == ':':
+            target = target[1:]
+            refnode['refspecific'] = True
+
         title = RE_DROP_IMPLICIT_FLAVOR.sub('', title)
         return title, target
 
