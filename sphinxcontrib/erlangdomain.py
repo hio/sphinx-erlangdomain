@@ -1232,6 +1232,14 @@ class ErlangDomain(Domain):
     # since sphinx 1.6.
     def get_full_qualified_name(self, node):
         # type: (nodes.Node) -> unicode
+        role = node['reftype']
+
+        if role == 'mod':
+            target = node['reftarget']
+            if target not in self.data['modules']:
+                return None
+            refname = 'module-' + target
+            return refname
 
         sig_text = node['reftarget']
         nsname   = ErlangObject.namespace_of_role(node['reftype'])
