@@ -1318,6 +1318,8 @@ class ErlangDomain(Domain):
     def _find_obj(self, env, env_modname, name, typ, searchorder=0):
         """
         Find an object for "name", perhaps using the given module name.
+
+        - `searchorder` -- 0=builtins first, 1=namespaces first (refspecific)
         """
 
         nsname  = ErlangObject.namespace_of_role(typ)
