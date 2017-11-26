@@ -1252,15 +1252,16 @@ class ErlangDomain(Domain):
     }
 
     roles = {
-        'callback': ErlangXRefRole(),
-        'func'    : ErlangXRefRole(),
-        'macro'   : ErlangXRefRole(),
-        'record'  : ErlangXRefRole(),
-        'type'    : ErlangXRefRole(),
-        'mod'     : ErlangXRefRole(),
+        'callback': ErlangXRefRole(warn_dangling=True),
+        'func'    : ErlangXRefRole(warn_dangling=True),
+        'macro'   : ErlangXRefRole(warn_dangling=True),
+        'record'  : ErlangXRefRole(warn_dangling=True),
+        'type'    : ErlangXRefRole(warn_dangling=True),
+        'mod'     : ErlangXRefRole(warn_dangling=True),
         'marker'  : ErlangMarkerRole(),
-        'seealso' : ErlangXRefRole(),
+        'seealso' : ErlangXRefRole(warn_dangling=True),
     }
+
     initial_data = {
         'objects'   : {
             # :: namespace -> modfuncname -> arity -> flavor -> ObjectEntry
