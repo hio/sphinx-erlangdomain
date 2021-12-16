@@ -30,7 +30,7 @@ Here are link targets for module :erl:mod:`test_module`.
    :param Identifier: Identify sender.
    :type  Identifier: ~erlang:string()
    :return: Some status.
-   :rtype:  :erl:type:`~erlang:atom()`
+   :rtype:  ~erlang:atom()
 
 .. erl:function:: variable_function(Name[, Optition]) -> ok.
 
@@ -40,8 +40,7 @@ Here are link targets for module :erl:mod:`test_module`.
    :type  Name: ~erlang:string()
    :param Option: Option param.
    :type  Option: ~erlang:atom()
-   :rtype:  ok
-
+   :rtype:  ``ok``
 
 .. erl:macro:: ?HostName
    

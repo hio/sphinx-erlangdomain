@@ -630,7 +630,7 @@ class ErlangBaseObject(ObjectDescription):
         Field('returnvalue', label=_('Returns'), has_arg=False,
               names=('returns', 'return')),
         Field('returntype', label=_('Return type'), has_arg=False,
-              names=('rtype',)),
+              names=('rtype',), bodyrolename='type'),
         GroupedField('exceptions', label=_('Raises'), rolename='type',
                      names=('raises', 'raise'),
                      can_collapse=True),
