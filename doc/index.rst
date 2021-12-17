@@ -4,25 +4,20 @@
    contain the root `toctree` directive.
 
 
-.. include:: ../README.rst
-
-
 Contents
 ========
 
 .. toctree::
-   :maxdepth: 2
+   :titlesonly:
 
    reference
+   readme
+   changelog
+
+Miscellaneous Page:
 
 * :ref:`genindex`
 * :ref:`search`
-
-
-ChangeLog
-=========
-
-.. include:: ../CHANGES
 
 
 License

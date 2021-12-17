@@ -74,7 +74,7 @@ The following directives are provided for module level contents:
 
          :param Chars:  characters to be output.
          :type  Chars:  unicode:chardata()
-         :rtype:  ok
+         :rtype:  ``ok``
 
       .. erl:function:: format(Fmt[, Args]) -> ok
 
@@ -83,8 +83,8 @@ The following directives are provided for module level contents:
          :param Fmt:   format string.
          :type  Fmt:   io:format()
          :param Args:  characters to be output.
-         :type  Args:  [term()]
-         :rtype:  ok
+         :type  Args:  [:erl:type:`term()`]
+         :rtype:  ``ok``
 
       .. erl:function:: format(Device, Fmt, Args) -> ok
 
@@ -95,8 +95,8 @@ The following directives are provided for module level contents:
          :param Fmt:     format string.
          :type  Fmt:     io:format()
          :param Args:    characters to be output.
-         :type  Args:    [term()]
-         :rtype: ok
+         :type  Args:    [:erl:type:`term()`]
+         :rtype: ``ok``
 
    These functions can be referenced by :rst:role:`erl:func`, for example::
 
@@ -195,9 +195,9 @@ The following directives are provided for module level contents:
      .. erl:record:: #file_info{}
 
         :param size:  size of the file.
-        :type  size:  non_neg_integer() | undefined
+        :type  size:  :type:`non_neg_integer()` | undefined
         :param type:  type of the file.
-        :type  type:  device | directory | other | regular | symlink | undefined
+        :type  type:  ``device`` | ``directory`` | ``other`` | ``regular`` | ``symlink`` | ``undefined``
 
         ...
 
@@ -240,9 +240,9 @@ The following directives are provided for module level contents:
         not equal, an informative exception will be generated.
 
         :param Expect:  an expected value.
-        :type  Expect:  A
+        :type  Expect:  *A*
         :param Expr:    an actual value.
-        :type  Expr:    A
+        :type  Expr:    *A*
 
 
    Macros can be referenced by :rst:role:`erl:macro`, for example::
@@ -277,8 +277,8 @@ The following directives are provided for module level contents:
         :param State:  current state.
         :type  State:  term()
         :rtype:
-          {ok, NewState} | {ok, NewState, hibernate}
-          | {swap_handler, Args1, NewState, Handler2, Args2} | remove_handler
+          {``ok``, *NewState*} | {``ok``, *NewState*, ``hibernate``}
+          | {``swap_handler``, *Args1*, *NewState*, *Handler2*, *Args2*} | ``remove_handler``
 
    Callbacks can be referenced by :rst:role:`erl:callback`, for example::
 
@@ -306,7 +306,7 @@ hyperlinked if a matching identifier is found:
 
 .. rst:role:: erl:func
 
-   Reference a Erlang function.
+   Reference an Erlang function.
 
    Function reference signature has a same format as :rst:dir:`erl:function`.
    ``when`` clause and a return annoration are not used for searching a target.
@@ -421,14 +421,27 @@ Available fields:
 
 ``:param NAME:  DESC``
   Description of a parameter.
-``:type  NAME:  DESC``
+
+``:type  NAME:  TYPE``
   Type of a parameter.
+
+  If the *TYPE* is plain text (no any markups), processed with
+  :rst:role:`erl:type`.
+
 ``:returns:  DESC``
   Description of the return value.
+
 ``:rtype:  TYPE``
   Type of the return value.
+
+  If the *TYPE* is plain text (no any markups), processed with
+  :rst:role:`erl:type`.
+
 ``:raises TYPE:  DESC``
   Description of an exception.
+
+  If the *TYPE* is plain text (no any markups), processed with
+  :rst:role:`erl:type`.
 
 Example of fields::
 
@@ -436,11 +449,11 @@ Example of fields::
 
      process ``abc`` feature.
 
-     :param Flag:  a flag.
-     :type  Flag:  abc
-     :returns:  a result.
+     :param Flag:  A flag.
+     :type  Flag:  ``abc``
+     :returns:  A result.
      :rtype:    result()
-     :raises badarg:  if the argument is bad.
+     :raises badarg:  If the argument is bad.
 
 Following directives are met as module level directives:
 
@@ -471,8 +484,8 @@ Flavor name
   This feature may be changed or removed in future release without notice.
 
 Erlang domain can take an additional name in each objects.
-Flavor name is not in Erlang Language, introduced by Erlang domain itself to
-identify function clauses.
+Flavor name is not a part of Erlang Language, introduced by Erlang domain
+itself to identify function clauses.
 
 For example::
 
@@ -491,3 +504,10 @@ For example::
 
 These clauses are identified by the portion of ``@trap_exit`` or
 ``@error_handler``, not by the erlang code ``Flag :: trap_exit``.
+
+It can be wrapped with brackets (``[`` and ``]``) to hide from document
+texts. e.g.::
+
+  .. erl:function:: erlang:process_flag(Flag :: trap_exit, Boolean) [@trap_exit] -> OldBoolean
+
+  * :erl:func:`erlang:process_flag/2[@trap_exit]`
