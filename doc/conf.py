@@ -88,7 +88,7 @@ pygments_style = 'sphinx'
 #modindex_common_prefix = []
 
 intersphinx_mapping = {
-    'sphinx': ('http://sphinx.pocoo.org', None)
+    'sphinx': ('https://www.sphinx-doc.org/en/master/', None)
 }
 
 # -- Options for HTML output ---------------------------------------------------
