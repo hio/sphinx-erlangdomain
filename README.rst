@@ -39,8 +39,8 @@ This is source:
 
     .. erl:function:: append(ListOfLists) -> List1
 
-       :type ListOfLists:  [[term()]]
-       :rtype:  [term()]
+       :type ListOfLists:  [[*term()*]]
+       :rtype:  [*term()*]
 
        Returns a list in which all the sub-lists of ListOfLists
        have been appended. For example:
@@ -53,10 +53,10 @@ This is source:
     .. erl:function:: append(List1, List2) -> List3
 
        :param List1:  First Item.
-       :type  List1:  [term()]
+       :type  List1:  [*term()*]
        :param List2:  Second Item.
-       :type  List2:  [term()]
-       :rtype:  [term()]
+       :type  List2:  [*term()*]
+       :rtype:  [*term()*]
 
        Returns a new list List3 which is made from the elements
        of List1 followed by the elements of List2. For example:
@@ -74,8 +74,8 @@ Results:
 
     .. erl:function:: append(ListOfLists) -> List1
 
-       :type ListOfLists:  [[term()]]
-       :rtype:  [term()]
+       :type ListOfLists:  [[*term()*]]
+       :rtype:  [*term()*]
 
        Returns a list in which all the sub-lists of ListOfLists
        have been appended. For example:
@@ -88,10 +88,10 @@ Results:
     .. erl:function:: append(List1, List2) -> List3
 
        :param List1:  First Item.
-       :type  List1:  [term()]
+       :type  List1:  [*term()*]
        :param List2:  Second Item.
-       :type  List2:  [term()]
-       :rtype:  [term()]
+       :type  List2:  [*term()*]
+       :rtype:  [*term()*]
 
        Returns a new list List3 which is made from the elements
        of List1 followed by the elements of List2. For example:
