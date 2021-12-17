@@ -612,7 +612,7 @@ class ErlangSignatureParser:
 
 class ErlangBaseObject(ObjectDescription):
     """
-    Description of a Erlang language object.
+    Description of an Erlang language object.
     """
 
     option_spec = {
@@ -885,7 +885,7 @@ class ErlangObject(ErlangBaseObject):
 
 class ErlangClauseObject(ErlangBaseObject):
     """
-    Description of a Erlang function clause object.
+    Description of an Erlang function clause object.
     """
 
     def _is_valid_location(self):
