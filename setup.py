@@ -16,7 +16,7 @@ requires = ['Sphinx>=1.0']
 setup(
     name='sphinxcontrib-erlangdomain',
     version='0.2',
-    url='http://bitbucket.org/birkenfeld/sphinx-contrib',
+    url='https://github.com/hio/sphinx-erlangdomain',
     download_url='http://pypi.python.org/pypi/sphinxcontrib-erlangdomain',
     license='BSD',
     author='SHIBUKAWA Yoshiki',
