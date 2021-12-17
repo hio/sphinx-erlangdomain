@@ -101,7 +101,7 @@ RE_SIGNATURE = re.compile( r'''
     )?
 
     # drop a terminal period at this time if any.
-    [.]?
+    [.;]?
     \Z
     ''', re.VERBOSE)
 
