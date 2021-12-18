@@ -7,7 +7,7 @@ Version 0.2 (In Development)
 ----------------------------
 
 * Rewrite handlings of objects.
-* Types and callbacks.
+* Support of types and callbacks.
 * Add an intersphinx resolution of Sphinx 1.6.
 
 
