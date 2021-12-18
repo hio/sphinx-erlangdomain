@@ -8,6 +8,10 @@
     :copyright: Copyright 2007-2010 by SHIBUKAWA Yoshiki
     :license: BSD, see LICENSE for details.
 """
+from typing import Dict, List, Tuple
+from docutils.nodes import Node
+from sphinx.environment import BuildEnvironment
+from docutils.parsers.rst.states import Inliner
 
 import copy
 from distutils.version import LooseVersion, StrictVersion
@@ -610,6 +614,67 @@ class ErlangSignatureParser:
 
         return self
 
+class ErlangRaisesField(TypedField):
+    def make_field(self, types: Dict[str, List[Node]], domain: str,
+                   items: Tuple, env: BuildEnvironment = None,
+                   inliner: Inliner = None, location: Node = None) -> nodes.field:
+        def handle_item(fieldarg: str, content: str) -> nodes.paragraph:
+            par = nodes.paragraph()
+            if fieldarg in types:
+                # NOTE: using .pop() here to prevent a single type node to be
+                # inserted twice into the doctree, which leads to
+                # inconsistencies later when references are resolved
+                fieldtype = types.pop(fieldarg)
+                if len(fieldtype) == 1 and isinstance(fieldtype[0], nodes.Text):
+                    typename = fieldtype[0].astext()
+                    handle_text(par, typename)
+                else:
+                    # already marked up.
+                    par += fieldtype
+            else:
+                # fieldarg is always a str. markups in fieldarg are removed
+                # by sphinx?
+                handle_text(par, fieldarg)
+
+            par += nodes.Text(' -- ')
+            par += content
+            return par
+
+        def handle_text(par: nodes.paragraph, text: str):
+            tmp = text.split(':', 1)
+            if len(tmp) == 2 and tmp[0] in ('error', 'throw', 'exit'):
+                err_cls = tmp[0]
+                text = tmp[1]
+                par += nodes.Text(err_cls + ':')
+
+            if text.isalnum():
+                # looks like an atom.
+                par.extend(self.make_xrefs(self.rolename, domain, text,
+                                           literal_code, env=env))
+            else:
+                # resolve with typerole.
+                par.extend(self.make_xrefs(self.typerolename, domain, text,
+                                           addnodes.literal_emphasis, env=env,
+                                           inliner=inliner, location=location))
+
+        fieldname = nodes.field_name('', self.label)
+        if len(items) == 1 and self.can_collapse:
+            fieldarg, content = items[0]
+            bodynode: Node = handle_item(fieldarg, content)
+        else:
+            bodynode = self.list_type()
+            for fieldarg, content in items:
+                bodynode += nodes.list_item('', handle_item(fieldarg, content))
+        fieldbody = nodes.field_body('', bodynode)
+        return nodes.field('', fieldname, fieldbody)
+
+class literal_code(nodes.literal, addnodes.not_smartquotable):
+    """Node that behaves like `code`, but further text processors are not
+    applied (e.g. smartypants for HTML output).
+
+    See also ``addnodes.literal_emphasis``.
+    """
+
 class ErlangBaseObject(ObjectDescription):
     """
     Description of an Erlang language object.
@@ -631,9 +696,10 @@ class ErlangBaseObject(ObjectDescription):
               names=('returns', 'return')),
         Field('returntype', label=_('Return type'), has_arg=False,
               names=('rtype',), bodyrolename='type'),
-        GroupedField('exceptions', label=_('Raises'), rolename='type',
-                     names=('raises', 'raise'),
-                     can_collapse=True),
+        ErlangRaisesField('exceptions', label=_('Raises'),
+                          names=('raises', 'raise'),
+                          typerolename='type', typenames=('raisetype',),
+                          can_collapse=True),
     ]
 
     NAMESPACE_FROM_OBJTYPE = {

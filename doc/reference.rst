@@ -437,11 +437,26 @@ Available fields:
   If the *TYPE* is plain text (no any markups), processed with
   :rst:role:`erl:type`.
 
-``:raises TYPE:  DESC``
+``:raises NAME:  DESC``
   Description of an exception.
 
-  If the *TYPE* is plain text (no any markups), processed with
-  :rst:role:`erl:type`.
+  If there is no corresponding ``:raisetype NAME:``, *NAME* is
+  treated as *EXC_TYPE*. Could not use any markups in *NAME*.
+
+  If *NAME* contains space char, unexpected result is rendered.
+
+``:raisetype NAME:  EXC_TYPE``
+  Type description for *NAME*.
+
+  If the *EXC_TYPE* is plain text (no any markups), processed as
+  following:
+
+  * started with one of error class, ``error:``, ``throw:`` or ``exit:``,
+    the error class is removed, output as plain text and continue to
+    process rest part.
+  * if consists of alphabets or digits only (``str.isalnum()``),
+    outputed as literal.
+  * otherwise, processed with :rst:role:`erl:type`.
 
 Example of fields::
 
@@ -454,6 +469,7 @@ Example of fields::
      :returns:  A result.
      :rtype:    result()
      :raises badarg:  If the argument is bad.
+     :raises throw:some_exc():  Some exception.
 
 Following directives are met as module level directives:
 
