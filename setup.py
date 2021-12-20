@@ -18,6 +18,10 @@ setup(
     version='0.2',
     url='https://github.com/hio/sphinx-erlangdomain',
     download_url='http://pypi.python.org/pypi/sphinxcontrib-erlangdomain',
+    project_urls={
+        'Documentation': 'https://pythonhosted.org/sphinxcontrib-erlangdomain/',
+        'Source': 'https://github.com/hio/sphinx-erlangdomain',
+    },
     license='BSD',
     author='SHIBUKAWA Yoshiki',
     author_email='yoshiki at shibu.jp',
