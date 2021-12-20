@@ -8,7 +8,7 @@
     :copyright: Copyright 2007-2010 by SHIBUKAWA Yoshiki
     :license: BSD, see LICENSE for details.
 """
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 from docutils.nodes import Node
 from sphinx.environment import BuildEnvironment
 from docutils.parsers.rst.states import Inliner
@@ -169,6 +169,14 @@ else:
     logger = logging.getLogger(__name__)
     def _warn(env, fmt, *args, **kwargs):
         logger.warn(fmt, *args, **kwargs)
+
+if _SPHINX_VERSION < LooseVersion('4.1.0'):
+    def make_xrefs_wrap(self, *args, inliner: Any = None, location: Any = None, **kw) -> List[Node]:
+        return self.make_xrefs(*args, **kw)
+else:
+    def make_xrefs_wrap(self, *args, **kw) -> List[Node]:
+        return self.make_xrefs(*args, **kw)
+
 # }}} compat.
 
 
@@ -649,11 +657,11 @@ class ErlangRaisesField(TypedField):
 
             if text.isalnum():
                 # looks like an atom.
-                par.extend(self.make_xrefs(self.rolename, domain, text,
+                par.extend(make_xrefs_wrap(self, self.rolename, domain, text,
                                            literal_code, env=env))
             else:
                 # resolve with typerole.
-                par.extend(self.make_xrefs(self.typerolename, domain, text,
+                par.extend(make_xrefs_wrap(self, self.typerolename, domain, text,
                                            addnodes.literal_emphasis, env=env,
                                            inliner=inliner, location=location))
 
