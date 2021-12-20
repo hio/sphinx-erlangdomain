@@ -655,7 +655,7 @@ class ErlangRaisesField(TypedField):
                 text = tmp[1]
                 par += nodes.Text(err_cls + ':')
 
-            if text.isalnum():
+            if RE_ATOM.match(text):
                 # looks like an atom.
                 par.extend(make_xrefs_wrap(self, self.rolename, domain, text,
                                            literal_code, env=env))
