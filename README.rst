@@ -132,5 +132,4 @@ Install
 
 .. code-block:: bash
 
-   $ easy_install -U sphinxcontrib-erlangdomain
-
+   $ pip3 install -U sphinxcontrib-erlangdomain

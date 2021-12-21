@@ -24,7 +24,7 @@ setup(
     },
     license='BSD',
     author='SHIBUKAWA Yoshiki',
-    author_email='yoshiki at shibu.jp',
+    author_email='yoshiki@shibu.jp',
     description='Sphinx extension sphinxcontrib-erlangdomain',
     long_description=long_desc,
     zip_safe=False,
