@@ -3,8 +3,8 @@
 This file describes user-visible changes between the extension versions.
 
 
-Version 0.2 (In Development)
-----------------------------
+Version 0.2 (2021-12-22)
+------------------------
 
 * Rewrite handlings of objects.
 * Support of types and callbacks.
