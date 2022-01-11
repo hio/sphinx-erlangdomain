@@ -25,8 +25,17 @@ needs_sphinx = '1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinxcontrib.erlangdomain',
-              'sphinx.ext.intersphinx']
+extensions = [
+    'sphinx.ext.intersphinx',
+]
+
+try:
+    # try to import inplace '../sphinxcontrib/erlangdomain.py'
+    sys.path.append(os.path.abspath('../sphinxcontrib'))
+    import erlangdomain
+    extensions.append('erlangdomain')
+except ModuleNotFoundError:
+    extensions.append('sphinxcontrib.erlangdomain')
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
