@@ -25,8 +25,8 @@ The Erlang domain (name **erl**) supports following objects:
 URLs
 ====
 
-:PyPI: http://pypi.python.org/pypi/sphinxcontrib-erlangdomain
-:Detail Document: http://packages.python.org/sphinxcontrib-erlangdomain
+:PyPI: https://pypi.org/project/sphinxcontrib-erlangdomain/
+:Detail Document: https://sphinxcontrib-erlangdomain.readthedocs.io/en/latest/
 
 Quick Sample
 ============
@@ -104,7 +104,7 @@ Results:
        ``lists:append(A, B)`` is equivalent to ``A ++ B``.
 
 .. note::
-   This content is copied from http://www.erlang.org/doc/man/lists.html
+   This content is copied from https://www.erlang.org/doc/man/lists.html
 
 ------------------
 
@@ -123,7 +123,7 @@ Results:
     it can be seen clearly that the first list is copied.
 
 .. note::
-   This content is copied from http://erlang.org/doc/efficiency_guide/listHandling.html
+   This content is copied from https://erlang.org/doc/efficiency_guide/listHandling.html
 
 -----------
 

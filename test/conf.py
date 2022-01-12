@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# sphinxcontrib-rubydomain-acceptancetest documentation build configuration file, created by
+# sphinxcontrib-erlangdomain-acceptancetest documentation build configuration file, created by
 # sphinx-quickstart on Sun Apr 25 13:27:18 2010.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'sphinxcontrib-rubydomain-acceptancetest'
+project = u'sphinxcontrib-erlangdomain-acceptancetest'
 copyright = u'2010, SHIBUKAWA Yoshiki'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -164,7 +164,7 @@ html_theme = 'default'
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'sphinxcontrib-rubydomain-acceptancetestdoc'
+htmlhelp_basename = 'sphinxcontrib-erlangdomain-acceptancetestdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -178,7 +178,7 @@ htmlhelp_basename = 'sphinxcontrib-rubydomain-acceptancetestdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'sphinxcontrib-rubydomain-acceptancetest.tex', u'sphinxcontrib-rubydomain-acceptancetest Documentation',
+  ('index', 'sphinxcontrib-erlangdomain-acceptancetest.tex', u'sphinxcontrib-erlangdomain-acceptancetest Documentation',
    u'SHIBUKAWA Yoshiki', 'manual'),
 ]
 
@@ -205,6 +205,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'sphinxcontrib-rubydomain-acceptancetest', u'sphinxcontrib-rubydomain-acceptancetest Documentation',
+    ('index', 'sphinxcontrib-erlangdomain-acceptancetest', u'sphinxcontrib-erlangdomain-acceptancetest Documentation',
      [u'SHIBUKAWA Yoshiki'], 1)
 ]
