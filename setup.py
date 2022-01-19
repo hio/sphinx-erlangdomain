@@ -15,7 +15,7 @@ requires = ['Sphinx>=1.0']
 
 setup(
     name='sphinxcontrib-erlangdomain',
-    version='0.2',
+    version='0.2.1',
     url='https://github.com/hio/sphinx-erlangdomain',
     download_url='https://pypi.org/project/sphinxcontrib-erlangdomain/',
     project_urls={
